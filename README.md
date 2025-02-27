@@ -27,7 +27,6 @@ This dataset should be a `csv` file with the following columns:
 - Type of property (House or apartment)
 - Subtype of property (Bungalow, Chalet, Mansion, ...)
 - Price
-- Type of sale (Exclusion of life sales)
 - Number of rooms
 - Living Area
 - Fully equipped kitchen (Yes/No)
@@ -47,6 +46,16 @@ Must-have features
 
 - Data all over Belgium.
 - Minimum 10 000 inputs without duplicates
-- No empty rows. Missing information should be to `None`.
+- No empty rows. Missing information should be to `None` or zero.
 - The dataset must be clean. Record numerical values when possible.
 
+#### Installation:
+1. Clone the repository.
+2. Install dependencies ``pip install -r requirements.txt`` in your environment.
+3. To collect more links links run ``python collect_links.py``
+4. Once done, run ``python get_property_info.py ``
+5. Feel free to explore the dataset!
+
+#### Results in one run:
+- Urls collected: 18.429
+- Dataset contains 18.371 rows.
