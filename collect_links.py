@@ -5,7 +5,7 @@ import os
 import sys
 from pathlib import Path
 
-project_path = Path(__file__).parents[0]
+project_path = Path(__file__).parent
 sys.path.append(os.path.abspath(project_path))
 
 def get_page_links(page_number: int) -> list:
@@ -18,7 +18,7 @@ def get_page_links(page_number: int) -> list:
     RETURNS
     links -list: list of urls from where the information of each property is to be collected.
     """
-    # Set heathers to avoid page's blockage
+    # Set heathers to avoid page's blocking
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
     }
@@ -34,15 +34,15 @@ def get_page_links(page_number: int) -> list:
     page_links = soup.select('a.card__title-link[href*="classified"]')
 
     # start an empty list and extract only the urls
-    links = []
+    collected_links = []
     for element in page_links:
         item_attrs = element.attrs
         link = item_attrs.get('href')
-        links.append(link)
-    return links
+        collected_links.append(link)
+    return collected_links
 
 
-def save_data(links):
+def save_data(collected_links):
     """ 
     Reads the links file to check for duplicates.
     Repeated links are skipped.
@@ -56,27 +56,31 @@ def save_data(links):
         read_lines = set(file.readlines())
 
     # Start a new empty list where only no-repeated links are stored
-    clean_links_list = []
+    new_links_list = []
     
     # Check if link is repeated or not
-    for link in links:
-        read_link = f'f{link}\n'
-        if read_link in read_lines:
+    for link in collected_links:
+        read_link = f'{link}\n' # new collected link that is being checked
+
+        is_project = read_link.split('/')[-5]
+        is_project = is_project.replace('-', ' ')
+        if 'real estate project' in is_project:
             continue
         else:
-            clean_links_list.append(link)
+            if read_link in read_lines: # check if link being checked is already in the csv file
+                continue # If so, skip and go to the next link
+            else:
+                new_links_list.append(link) # Add to new, non repeated links list
 
     # Save new links to the links.csv file
-    with open(f'{project_path}/data/links.csv', 'a') as file:
-        
-        file.writelines([link + '\n' for link in clean_links_list])
+    with open(f'{project_path}/data/links.csv', 'a') as file: 
+        file.writelines([link + '\n' for link in new_links_list])
 
     #close the file
     file.close()
 
     # Print total new links collected.
-    new_links = len(clean_links_list)
-    print(f'Total new links: {new_links}')
+    print(f'Total new links: {len(new_links_list)}')
 
 
 # Function to apply concurrency once app is running in production // 
@@ -86,7 +90,7 @@ def concurrent_links_scraper():
     # Using ThreadPoolExecutor to scrape multiple pages concurrently
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         # Submit tasks for each page (e.g., pages 1 to 333)
-        future_to_page = {executor.submit(get_page_links, page+1): page+1 for page in range(2)}
+        future_to_page = {executor.submit(get_page_links, page+1): page+1 for page in range(333)}
     
         # Process results as they come in
         for future in concurrent.futures.as_completed(future_to_page):
