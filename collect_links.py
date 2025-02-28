@@ -90,7 +90,7 @@ def concurrent_links_scraper():
     # Using ThreadPoolExecutor to scrape multiple pages concurrently
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         # Submit tasks for each page (e.g., pages 1 to 333)
-        future_to_page = {executor.submit(get_page_links, page+1): page+1 for page in range(333)}
+        future_to_page = {executor.submit(get_page_links, page+1): page+1 for page in range(1)}
     
         # Process results as they come in
         for future in concurrent.futures.as_completed(future_to_page):
