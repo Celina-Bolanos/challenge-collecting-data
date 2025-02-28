@@ -1,9 +1,9 @@
-import requests
-from bs4 import BeautifulSoup
-import concurrent.futures
 import os
 import sys
 from pathlib import Path
+import concurrent.futures
+import requests
+from bs4 import BeautifulSoup
 
 project_path = Path(__file__).parent
 sys.path.append(os.path.abspath(project_path))
