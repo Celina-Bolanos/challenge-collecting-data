@@ -1,10 +1,10 @@
 import os
 import sys
 from pathlib import Path
+import concurrent.futures
+import re
 import requests
 from bs4 import BeautifulSoup
-import re
-import concurrent.futures
 import pandas as pd
 
 project_path = Path(__file__).parents[0]
@@ -40,10 +40,9 @@ def collect_data(link: str) -> dict:
     is_project = is_project.replace('-', ' ')
     if 'real estate project' in is_project:
         # skip
-        return
+        print('Real state project. Skipping.')
     else:
         # Get the property's information
-
         # Set heathers to avoid target page's blocking
         headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
@@ -152,12 +151,12 @@ def collect_data(link: str) -> dict:
             # Terrace
             terrace = details_dict.get('Terrace')
             terrace_area = details_dict.get('Terrace surface')
-            raw_property_info['terrace'] = terrace_area if terrace != None and terrace_area != None else 0
+            raw_property_info['terrace'] = terrace_area if terrace is not None and terrace_area != None else 0
 
             # Garden
             garden = details_dict.get('Garden')
             garden_area = details_dict.get('Garden surface')
-            raw_property_info['garden'] = garden_area if garden != None and garden_area != None else 0
+            raw_property_info['garden'] = garden_area if garden is not None and garden_area != None else 0
 
             # Plot surface
             plot_surface =  details_dict.get('Surface of the plot')
@@ -165,7 +164,7 @@ def collect_data(link: str) -> dict:
 
             # Facades
             facades = details_dict.get('Number of frontages') 
-            raw_property_info['facades'] = facades if facades != None else 0
+            raw_property_info['facades'] = facades if facades is not None else 0
 
             # Swimming pool
             swim_pool = details_dict.get('Swimming pool') 
@@ -185,8 +184,7 @@ def concurrent_scraper(links_to_check):
     Uses ThreadPoolExecutor to scrape multiple pages concurrently.
     Applies collect_data() function to each link in links_to_check.
     """
-    scraped_properties = []  
-
+    scraped_properties = []
     # Using ThreadPoolExecutor for concurrency
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         # Submit tasks for each link
@@ -198,8 +196,7 @@ def concurrent_scraper(links_to_check):
                 if result: 
                     scraped_properties.append(result)
             except Exception as e:
-                print(f"Error processing link {future_to_link[future]}: {e}") 
-
+                print(f"Error processing link {future_to_link[future]}: {e}")
     return scraped_properties
 
 
@@ -220,6 +217,3 @@ if __name__ == "__main__":
     links_to_check = load_urls()[:2]
     scraped_data = concurrent_scraper(links_to_check)
     save_to_csv(scraped_data)
-
-
-    
