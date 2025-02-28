@@ -278,9 +278,8 @@ def save_to_csv(scraped_properties: list):
     df.to_csv(f"{project_path}/data/housing_market_data.csv", index=False)
     return df
 
-
 if __name__ == "__main__":
     links_to_check = load_urls()[:2]
-    # scraped_data = concurrent_scraper(links_to_check)
-    # save_to_csv(scraped_data)
-    print(len(links_to_check))
+    scraped_data = concurrent_scraper(links_to_check)
+    save_to_csv(scraped_data)
+
