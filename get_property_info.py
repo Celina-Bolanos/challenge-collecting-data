@@ -217,7 +217,7 @@ def save_to_csv(scraped_properties: list):
     return df
 
 if __name__ == "__main__":
-    links_to_check = load_urls()
+    links_to_check = load_urls()[:2]
     scraped_data = concurrent_scraper(links_to_check)
     save_to_csv(scraped_data)
 
